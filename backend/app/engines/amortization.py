@@ -1,3 +1,18 @@
+def truncate_preview(schedule: dict, preview_rows: int = 12) -> dict:
+    """从已生成的全表结果中按 preview_rows 切片，只做只读截断。
+
+    不重新计算、不修改全表的余额序列；row_count 始终为全表总期数。
+    preview_rows 大于等于总期数时 preview 即为全表。
+    """
+    rows = schedule["rows"]
+    return {
+        "monthly_payment": schedule["monthly_payment"],
+        "total_interest": schedule["total_interest"],
+        "total_payment": schedule["total_payment"],
+        "preview": rows[:preview_rows],
+        "row_count": len(rows),
+    }
+
 def equal_payment_schedule(principal: float, annual_rate: float, months: int) -> dict:
     P = float(principal)
     n = int(months)
