@@ -1,5 +1,5 @@
 from app.db import connect
-from app.engines.amortization import equal_payment_schedule
+from app.engines.amortization import equal_payment_schedule, schedule_response
 from app.repositories import loans, runs, settings
 
 class MortgageService:
@@ -13,9 +13,7 @@ class MortgageService:
     def history(self, limit=50): return runs.list_recent(self._c, limit)
     def schedule(self, principal, annual_rate, months, loan_id, persist, preview_rows=12):
         full = equal_payment_schedule(principal, annual_rate, months)
-        out = {k: full[k] for k in ("monthly_payment", "total_interest", "total_payment")}
-        out["preview"] = full["rows"][:preview_rows]
-        out["row_count"] = len(full["rows"])
+        out = schedule_response(full, preview_rows)
         rid = None
         if persist:
             rid = runs.insert(self._c, "schedule", {"principal": principal, "annual_rate": annual_rate, "months": months}, out, loan_id)

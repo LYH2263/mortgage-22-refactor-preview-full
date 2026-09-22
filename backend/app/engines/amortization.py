@@ -34,3 +34,22 @@ def equal_payment_schedule(principal: float, annual_rate: float, months: int) ->
         "total_payment": round(sum(x["payment"] for x in rows), 2),
         "rows": rows,
     }
+
+
+def truncate_rows(rows: list, preview_rows: int) -> list:
+    """截取全表前 preview_rows 行作为预览。
+
+    纯截断：只对全表做切片，不重算、不改写全表的余额序列。
+    """
+    return list(rows[:preview_rows])
+
+
+def schedule_response(full: dict, preview_rows: int) -> dict:
+    """由全表组装 schedule 回包：汇总值 + 截断预览 + 总期数。"""
+    return {
+        "monthly_payment": full["monthly_payment"],
+        "total_interest": full["total_interest"],
+        "total_payment": full["total_payment"],
+        "preview": truncate_rows(full["rows"], preview_rows),
+        "row_count": len(full["rows"]),
+    }
